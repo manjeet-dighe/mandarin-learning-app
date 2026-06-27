@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>中文 Mandarin Learning App</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f3f4f6;color:#111}
+.hdr{background:#fff;border-bottom:1px solid #e5e7eb;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+.hdr h1{font-size:18px;font-weight:700;color:#b91c1c}.hdr p{font-size:11px;color:#6b7280;margin-top:1px}
+.stats{display:flex;gap:16px}.stat{text-align:right}.stat .val{font-size:20px;font-weight:700}.stat .lbl{font-size:10px;color:#6b7280}
+.s-red{color:#ef4444}.s-blue{color:#2563eb}
+.tabs{background:#fff;border-bottom:1px solid #e5e7eb;display:flex;overflow-x:auto}
+.tab{padding:10px 16px;font-size:13px;font-weight:600;border:none;background:none;border-bottom:2px solid transparent;cursor:pointer;color:#6b7280;white-space:nowrap}
+.tab:hover{background:#f9fafb;color:#111}.tab.on{color:#b91c1c;border-bottom-color:#b91c1c;background:#fef2f2}
+.main{max-width:640px;margin:0 auto;padding:14px}
+.goal{background:#065f46;color:#ecfdf5;border-radius:10px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.goal h3{font-size:13px;font-weight:600}.goal p{font-size:11px;color:#a7f3d0;margin-top:2px}
+.goal .num{font-size:26px;font-weight:700;text-align:right}.goal .num span{font-size:11px;color:#a7f3d0;display:block}
+.anote{display:none;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:8px 12px;margin-bottom:10px;font-size:12px;color:#1d4ed8}
+.anote.show{display:block}
+.card{background:#fff;border-radius:10px;border:1px solid #e5e7eb;overflow:hidden;margin-bottom:12px}
+.card-hd{background:#7f1d1d;color:#fff;padding:12px 16px;display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.card-hd h2{font-size:16px;font-weight:700}.card-hd p{font-size:11px;opacity:.8;margin-top:3px}
+.dur{background:rgba(255,255,255,.2);padding:3px 8px;border-radius:6px;font-size:10px;flex-shrink:0}
+.subnav{background:#f9fafb;padding:8px 12px;border-bottom:1px solid #f3f4f6;display:flex;gap:6px;flex-wrap:wrap}
+.pill{padding:4px 10px;border-radius:999px;font-size:11px;font-weight:600;border:1px solid #d1d5db;background:#fff;cursor:pointer;color:#374151}
+.pill:hover{background:#f3f4f6}.pill.on{background:#b91c1c;color:#fff;border-color:#b91c1c}.pill.dn{background:#f0fdf4;color:#166534;border-color:#86efac}
+.body{padding:16px}
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}.sh span{font-size:13px;font-weight:700}
+.vrow{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:8px;border:1px solid #e5e7eb;margin-bottom:7px;transition:all .15s}
+.vrow.pl{border-color:#ef4444;background:#fff5f5}
+.vl{display:flex;align-items:center;gap:12px;flex:1}
+.vc{font-size:26px;font-weight:700;color:#7f1d1d;min-width:40px}
+.vp{font-size:13px;color:#1d4ed8;font-family:monospace}.ve{font-size:11px;color:#6b7280;margin-top:1px}
+.spk{width:34px;height:34px;border-radius:8px;border:1px solid #d1d5db;background:#fff;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.spk:hover{border-color:#ef4444;background:#fff5f5}.spk.pl{border-color:#ef4444;background:#fff5f5}
+.pall{padding:6px 12px;background:#b91c1c;color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer}
+.pall:hover{background:#7f1d1d}
+.tip{background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:10px 12px;margin-top:12px;font-size:12px;color:#78350f;line-height:1.6}
+.tip strong{display:block;font-size:11px;color:#92400e;margin-bottom:3px}
+.acts{display:flex;gap:8px;margin-top:14px}
+.bq{flex:1;padding:10px;background:#1d4ed8;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer}
+.bq:hover{background:#1e40af}
+.bc{padding:10px 14px;background:#166534;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+.bc:hover{background:#14532d}
+.bdone{padding:10px 14px;background:#f0fdf4;color:#166534;border:1px solid #86efac;border-radius:8px;font-size:12px;font-weight:700;white-space:nowrap}
+.cbanner{background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:16px;text-align:center;margin-top:12px}
+.cbanner h3{font-size:15px;font-weight:700;color:#14532d;margin-bottom:4px}.cbanner p{font-size:12px;color:#166534;margin-bottom:10px}
+.bnext{padding:9px 18px;background:#166534;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer}
+.bnext:hover{background:#14532d}
+.nocont{padding:16px;text-align:center;color:#6b7280;font-size:13px}
+.qwrap{background:#fff;border-radius:10px;border:1px solid #e5e7eb;padding:16px}
+.qhd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.qhd h3{font-size:15px;font-weight:700}.qpill{background:#f3f4f6;padding:4px 10px;border-radius:8px;font-size:11px;font-weight:700}
+.qq{background:#1d4ed8;color:#fff;padding:12px 14px;border-radius:8px;margin-bottom:10px;display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.qq p{font-size:13px;font-weight:600;flex:1;line-height:1.5}
+.qlisten{padding:6px 10px;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);border-radius:6px;font-size:11px;color:#fff;cursor:pointer;flex-shrink:0}
+.qlisten:hover{background:rgba(255,255,255,.3)}
+.qopts{display:grid;gap:7px}
+.qopt{width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;background:#fff;text-align:left;cursor:pointer;font-size:12px;display:flex;align-items:center;gap:8px;color:#111}
+.qopt:hover:not([disabled]){border-color:#2563eb;background:#eff6ff}
+.qopt.cor{border-color:#16a34a;background:#f0fdf4;color:#14532d}
+.qopt.wrg{border-color:#dc2626;background:#fef2f2;color:#7f1d1d}
+.oll{width:22px;height:22px;border-radius:50%;background:#f3f4f6;border:1px solid #d1d5db;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+.qstat{background:#f9fafb;border-radius:8px;padding:10px;text-align:center;margin-top:8px}
+.qstat .scr{font-size:16px;font-weight:700}.qstat .ht{font-size:11px;color:#6b7280;margin-top:2px}
+.qfail{background:#fef2f2;border:1px solid #fca5a5;border-radius:8px;padding:12px;text-align:center;margin-top:10px}
+.qfail p{font-size:12px;color:#991b1b;margin-bottom:8px}
+.bretry{padding:8px 16px;background:#b91c1c;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer}
+.sgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:14px}
+.mc{background:#fff;border-radius:10px;border:1px solid #e5e7eb;padding:12px}
+.mc .lbl{font-size:11px;color:#6b7280;margin-bottom:3px}.mc .val{font-size:24px;font-weight:700}
+.c-o{color:#ef4444}.c-b{color:#2563eb}.c-g{color:#16a34a}.c-t{color:#0d9488}
+.pblock{background:#fff;border-radius:10px;border:1px solid #e5e7eb;padding:14px}
+.pblock h3{font-size:13px;font-weight:700;margin-bottom:12px}
+.prow{margin-bottom:12px}.prow:last-child{margin-bottom:0}
+.prow-hd{display:flex;justify-content:space-between;margin-bottom:5px;font-size:12px;font-weight:600}
+.prow-hd span:last-child{font-weight:400;color:#6b7280}
+.pbg{background:#f3f4f6;border-radius:999px;height:6px}.pfill{background:#b91c1c;height:6px;border-radius:999px;transition:width .5s}
+.mcard{background:#fff;border-radius:10px;border:1px solid #e5e7eb;overflow:hidden;margin-bottom:10px}
+.mhd{background:#7f1d1d;color:#fff;padding:10px 14px}
+.mhd h3{font-size:13px;font-weight:700}.mhd p{font-size:10px;opacity:.8;margin-top:1px}
+.wsec{padding:8px 12px;border-bottom:1px solid #f3f4f6}.wsec:last-child{border-bottom:none}
+.wlbl{font-size:10px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+.li{display:flex;align-items:center;justify-content:space-between;padding:7px 8px;border-radius:6px;border:1px solid #f3f4f6;margin-bottom:3px;cursor:pointer}
+.li:hover{background:#f9fafb}.li.dn{background:#f0fdf4;border-color:#86efac}
+.li-l{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:500}
+.li.dn .li-l{color:#166534}.li-r{font-size:10px;color:#6b7280}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+const CONTENT={
+  "1-1-0":{chinese:["妈","麻","马","骂"],pinyin:["mā","má","mǎ","mà"],english:["mother","numb","horse","scold"],tip:"Same syllable, four tones = four different words. Tone 1 is high/flat, 2 rises, 3 dips then rises, 4 falls sharply."},
+  "1-1-1":{chinese:["你好","早上好","晚安","再见"],pinyin:["nǐ hǎo","zǎoshang hǎo","wǎn ān","zàijiàn"],english:["hello","good morning","good night","goodbye"],tip:"你好 works any time of day. 再见 literally means 'see you again' — like au revoir in French."},
+  "1-1-2":{chinese:["一","二","三","四","五"],pinyin:["yī","èr","sān","sì","wǔ"],english:["one","two","three","four","five"],tip:"Each number uses a different tone. Counting to 5 is secretly a full tone workout."},
+  "1-2-0":{chinese:["我叫","你叫什么","我是","很高兴认识你"],pinyin:["wǒ jiào","nǐ jiào shénme","wǒ shì","hěn gāoxìng rènshi nǐ"],english:["my name is","what's your name","I am","nice to meet you"],tip:"叫 (jiào) = called/named. 是 (shì) = am/is/are. Use 我叫 for names, 我是 for your role."},
+  "1-2-1":{chinese:["六","七","八","九","十"],pinyin:["liù","qī","bā","jiǔ","shí"],english:["six","seven","eight","nine","ten"],tip:"You can now count to 10. 十 + number builds 11–19: 十一, 十二, 十三..."},
+  "1-2-2":{chinese:["中国","美国","英国","你是哪国人"],pinyin:["Zhōngguó","Měiguó","Yīngguó","nǐ shì nǎ guó rén"],english:["China","America","England","what's your nationality"],tip:"[Country] + 人 (rén) = person from there. 中国人 = Chinese person, 美国人 = American."},
+  "1-3-0":{chinese:["我要","这个","那个","多少钱"],pinyin:["wǒ yào","zhège","nàge","duōshao qián"],english:["I want","this one","that one","how much"],tip:"Just 4 phrases let you shop anywhere in China. Point and say 这个 or 那个, then ask 多少钱."},
+  "1-3-1":{chinese:["水","茶","咖啡","可乐","啤酒"],pinyin:["shuǐ","chá","kāfēi","kělè","píjiǔ"],english:["water","tea","coffee","cola","beer"],tip:"Add 我要 to order: 我要茶 = I want tea. 咖啡 (kāfēi) sounds very close to 'coffee'!"},
+  "1-3-2":{chinese:["请","谢谢","对不起","没关系"],pinyin:["qǐng","xièxie","duìbuqǐ","méi guānxi"],english:["please","thank you","sorry","no problem"],tip:"谢谢 — the second 谢 is a light neutral tone. Use 对不起 for real apologies."},
+  "1-4-0":{chinese:["今天","明天","昨天","现在","星期"],pinyin:["jīntiān","míngtiān","zuótiān","xiànzài","xīngqī"],english:["today","tomorrow","yesterday","now","week"],tip:"星期 + number = weekday: 星期一 = Monday, 星期二 = Tuesday, 星期天 = Sunday."},
+  "1-4-1":{chinese:["早上","中午","下午","晚上","几点"],pinyin:["zǎoshang","zhōngwǔ","xiàwǔ","wǎnshang","jǐ diǎn"],english:["morning","noon","afternoon","evening","what time"],tip:"几点 (jǐ diǎn) = what time? Add a number: 三点 = 3 o'clock. Very simple!"},
+  "1-4-2":{chinese:["我们去","好","可以","不行","走吧"],pinyin:["wǒmen qù","hǎo","kěyǐ","bù xíng","zǒu ba"],english:["let's go","ok/good","can/possible","not ok","let's go!"],tip:"吧 adds a 'shall we?' feeling to suggestions — very natural in spoken Mandarin."},
+  "2-1-0":{chinese:["爸爸","妈妈","哥哥","姐姐","弟弟","妹妹"],pinyin:["bàba","māma","gēge","jiějie","dìdi","mèimei"],english:["father","mother","older brother","older sister","younger brother","younger sister"],tip:"Chinese always specifies older vs younger siblings. 哥/姐 = older, 弟/妹 = younger."},
+  "2-1-1":{chinese:["很高","很矮","很胖","很瘦","很帅"],pinyin:["hěn gāo","hěn ǎi","hěn pàng","hěn shòu","hěn shuài"],english:["very tall","very short","very chubby","very slim","very handsome"],tip:"很 (hěn) softens adjectives. Without it, the sentence sounds like a blunt comparison."},
+  "2-1-2":{chinese:["朋友","同事","老师","学生","这是我的"],pinyin:["péngyou","tóngshì","lǎoshī","xuésheng","zhè shì wǒ de"],english:["friend","colleague","teacher","student","this is my"],tip:"Introduce people: 这是我的朋友 = This is my friend. 的 (de) is the possessive marker."},
+  "2-2-0":{chinese:["医生","护士","老师","工程师","厨师"],pinyin:["yīshēng","hùshi","lǎoshī","gōngchéngshī","chúshī"],english:["doctor","nurse","teacher","engineer","chef"],tip:"我是 + job = I am a [job]. No article needed in Chinese! 我是医生 = I am a doctor."},
+  "2-2-1":{chinese:["工作","学习","休息","忙","累"],pinyin:["gōngzuò","xuéxí","xiūxi","máng","lèi"],english:["work","study","rest","busy","tired"],tip:"我很忙 = I'm very busy. 累 (lèi) = tired from effort — different from 困 (kùn) = sleepy."},
+  "2-2-2":{chinese:["上课","下课","考试","作业","书"],pinyin:["shàngkè","xiàkè","kǎoshì","zuòyè","shū"],english:["start class","end class","exam","homework","book"],tip:"上 = start/up, 下 = end/down. Also: 上班 = start work, 下班 = finish work. Same pattern!"},
+  "2-3-0":{chinese:["我喜欢","打篮球","踢足球","游泳","跑步"],pinyin:["wǒ xǐhuan","dǎ lánqiú","tī zúqiú","yóuyǒng","pǎobù"],english:["I like","play basketball","play soccer","swim","run"],tip:"打 = hand sports. 踢 = kicking/foot sports. 我喜欢 + activity starts any hobby conversation."},
+  "2-3-1":{chinese:["看电影","听音乐","看书","玩游戏"],pinyin:["kàn diànyǐng","tīng yīnyuè","kàn shū","wán yóuxì"],english:["watch movies","listen to music","read books","play games"],tip:"看 = watch or read. 听 = listen. 玩 = play games (not sports). Three essential verbs!"},
+  "2-3-2":{chinese:["周末","我想","你想吗","好啊","不想"],pinyin:["zhōumò","wǒ xiǎng","nǐ xiǎng ma","hǎo a","bù xiǎng"],english:["weekend","I want to","do you want to","sure!","don't want to"],tip:"吗 at the end makes a yes/no question. 好啊 — the 啊 adds warmth and enthusiasm."},
+  "2-4-0":{chinese:["好吃","难吃","好喝","我觉得","不错"],pinyin:["hǎochī","nánchī","hǎohē","wǒ juéde","búcuò"],english:["delicious","bad tasting","tasty (drink)","I think","not bad"],tip:"不错 (búcuò) literally 'not wrong' — a very common way to say 'pretty good' casually."},
+  "2-4-1":{chinese:["比","更","最","一样","不一样"],pinyin:["bǐ","gèng","zuì","yīyàng","bù yīyàng"],english:["compared to","more","most","same","different"],tip:"A 比 B + adjective: 苹果比香蕉甜 = Apples are sweeter than bananas. 最 = superlative."},
+  "2-4-2":{chinese:["我喜欢","我更喜欢","我最喜欢","都可以","随便"],pinyin:["wǒ xǐhuan","wǒ gèng xǐhuan","wǒ zuì xǐhuan","dōu kěyǐ","suíbiàn"],english:["I like","I prefer","I like most","either is fine","whatever you like"],tip:"随便 (suíbiàn) = 'whatever/up to you' — incredibly useful in casual conversation."}
+};
+
+const PLAN={
+  1:{title:"Survival Chinese",focus:"Greetings, numbers, basic needs",weeks:{
+    1:{title:"Sounds & Tones",lessons:[{title:"The 4 Tones",type:"pronunciation",duration:"8 min"},{title:"Greetings",type:"conversation",duration:"7 min"},{title:"Numbers 1–5",type:"vocabulary",duration:"6 min"}]},
+    2:{title:"Introducing Yourself",lessons:[{title:"My Name Is",type:"conversation",duration:"8 min"},{title:"Numbers 6–10",type:"vocabulary",duration:"6 min"},{title:"Countries",type:"conversation",duration:"7 min"}]},
+    3:{title:"Getting What You Need",lessons:[{title:"I Want…",type:"conversation",duration:"8 min"},{title:"Drinks & Food",type:"vocabulary",duration:"7 min"},{title:"Being Polite",type:"conversation",duration:"6 min"}]},
+    4:{title:"Time & Plans",lessons:[{title:"Time Words",type:"vocabulary",duration:"7 min"},{title:"Times of Day",type:"conversation",duration:"8 min"},{title:"Let's Go",type:"conversation",duration:"6 min"}]}
+  }},
+  2:{title:"Daily Life",focus:"Family, work, hobbies, opinions",weeks:{
+    1:{title:"Family & People",lessons:[{title:"Family Members",type:"vocabulary",duration:"7 min"},{title:"Describing People",type:"conversation",duration:"8 min"},{title:"Relationships",type:"conversation",duration:"7 min"}]},
+    2:{title:"Work & Study",lessons:[{title:"Jobs",type:"vocabulary",duration:"7 min"},{title:"Work Life",type:"conversation",duration:"8 min"},{title:"School",type:"conversation",duration:"7 min"}]},
+    3:{title:"Free Time",lessons:[{title:"Sports",type:"vocabulary",duration:"7 min"},{title:"Entertainment",type:"conversation",duration:"8 min"},{title:"Weekend Plans",type:"conversation",duration:"7 min"}]},
+    4:{title:"Expressing Yourself",lessons:[{title:"Tastes & Opinions",type:"conversation",duration:"8 min"},{title:"Comparing",type:"grammar",duration:"9 min"},{title:"Preferences",type:"conversation",duration:"7 min"}]}
+  }},
+  3:{title:"Out & About",focus:"Shopping, dining, travel",weeks:{
+    1:{title:"Shopping",lessons:[{title:"At the Market",type:"conversation",duration:"8 min"},{title:"Bargaining",type:"conversation",duration:"9 min"},{title:"Sizes & Colors",type:"vocabulary",duration:"7 min"}]},
+    2:{title:"Restaurants",lessons:[{title:"Ordering Food",type:"conversation",duration:"8 min"},{title:"Food Preferences",type:"conversation",duration:"7 min"},{title:"Paying the Bill",type:"conversation",duration:"6 min"}]},
+    3:{title:"Getting Around",lessons:[{title:"Directions",type:"conversation",duration:"9 min"},{title:"Transportation",type:"vocabulary",duration:"7 min"},{title:"Taking a Taxi",type:"conversation",duration:"7 min"}]},
+    4:{title:"Problems",lessons:[{title:"Asking for Help",type:"conversation",duration:"8 min"},{title:"Emergencies",type:"conversation",duration:"9 min"},{title:"Complaints",type:"conversation",duration:"7 min"}]}
+  }},
+  4:{title:"Complex Communication",focus:"Time, emotions, descriptions",weeks:{
+    1:{title:"Time & Experiences",lessons:[{title:"Past Tense",type:"grammar",duration:"9 min"},{title:"Future Plans",type:"conversation",duration:"8 min"},{title:"Duration",type:"grammar",duration:"8 min"}]},
+    2:{title:"Emotions",lessons:[{title:"Feelings",type:"conversation",duration:"7 min"},{title:"Worries & Comfort",type:"conversation",duration:"8 min"},{title:"Celebrations",type:"conversation",duration:"7 min"}]},
+    3:{title:"Descriptions",lessons:[{title:"Physical Details",type:"vocabulary",duration:"7 min"},{title:"Locations",type:"grammar",duration:"8 min"},{title:"Weather",type:"conversation",duration:"7 min"}]},
+    4:{title:"Storytelling",lessons:[{title:"Narrating Events",type:"conversation",duration:"9 min"},{title:"Cause & Effect",type:"grammar",duration:"8 min"},{title:"Sequencing",type:"grammar",duration:"8 min"}]}
+  }},
+  5:{title:"Advanced Fluency",focus:"Culture, idioms, natural conversation",weeks:{
+    1:{title:"Culture",lessons:[{title:"Cultural Concepts",type:"culture",duration:"10 min"},{title:"Formality Levels",type:"conversation",duration:"9 min"},{title:"Business Talk",type:"conversation",duration:"9 min"}]},
+    2:{title:"Idioms",lessons:[{title:"Common Idioms",type:"vocabulary",duration:"9 min"},{title:"Proverbs",type:"culture",duration:"8 min"},{title:"Modern Slang",type:"vocabulary",duration:"8 min"}]},
+    3:{title:"Abstract Concepts",lessons:[{title:"Philosophy",type:"conversation",duration:"10 min"},{title:"Hypotheticals",type:"grammar",duration:"9 min"},{title:"Debates",type:"conversation",duration:"10 min"}]},
+    4:{title:"Fluency Integration",lessons:[{title:"Natural Conversation",type:"conversation",duration:"10 min"},{title:"Complex Situations",type:"conversation",duration:"10 min"},{title:"Cultural Integration",type:"culture",duration:"10 min"}]}
+  }}
+};
+
+// Module-level state — no stale closures possible
+const S={month:1,week:1,lesson:0,tab:'today',done:new Set(),playingId:null,streak:1,todayDone:0,inQuiz:false,showCompletion:false};
+const Q={exercises:[],index:0,score:0,answered:null,failed:false};
+
+// ── AUDIO: per-item tracking, safety timeout, try/catch, error notice ──
+let safetyTimer=null;
+const resetAudio=()=>{clearTimeout(safetyTimer);safetyTimer=null;S.playingId=null;render();};
+const speak=(text,id)=>{
+  if(!text)return;
+  clearTimeout(safetyTimer);
+  if(!('speechSynthesis'in window)){document.getElementById('anote').classList.add('show');return;}
+  window.speechSynthesis.cancel();
+  S.playingId=id;render();
+  try{
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang='zh-CN';u.rate=0.72;
+    const zh=window.speechSynthesis.getVoices().find(v=>v.lang.startsWith('zh'));
+    if(zh)u.voice=zh;
+    u.onend=resetAudio;u.onerror=resetAudio;
+    safetyTimer=setTimeout(resetAudio,7000);
+    window.speechSynthesis.speak(u);
+  }catch(e){resetAudio();}
+};
+const stopAudio=()=>{clearTimeout(safetyTimer);if('speechSynthesis'in window)window.speechSynthesis.cancel();S.playingId=null;};
+
+// ── HELPERS ──
+const wData=()=>PLAN[S.month]?.weeks?.[S.week]||{title:'',lessons:[]};
+const lData=()=>wData().lessons?.[S.lesson]||{title:'',type:'',duration:'7 min'};
+const lContent=()=>CONTENT[`${S.month}-${S.week}-${S.lesson}`]||null;
+const lId=()=>`${S.month}-${S.week}-${S.lesson}`;
+
+// Validates state before every render — prevents blank screen from week mismatch
+const validate=()=>{
+  if(!PLAN[S.month])S.month=1;
+  const wkeys=Object.keys(PLAN[S.month].weeks).map(Number);
+  if(!wkeys.includes(S.week))S.week=wkeys[0];
+  if(S.lesson>=wData().lessons.length)S.lesson=0;
+};
+
+const totalLessons=()=>Object.values(PLAN).reduce((t,m)=>t+Object.values(m.weeks).reduce((s,w)=>s+w.lessons.length,0),0);
+const progPct=()=>Math.round(S.done.size/totalLessons()*100);
+const monthProg=mn=>{let total=0,done=0;Object.entries(PLAN[mn].weeks).forEach(([wn,w])=>w.lessons.forEach((_,li)=>{total++;if(S.done.has(`${mn}-${wn}-${li}`))done++;}));return{done,total};};
+
+// Quiz with shuffled options — correct answer not always position A
+const makeQ=(question,correct,wrongPool,audio)=>{
+  const wrongs=wrongPool.filter(w=>w!==correct);
+  while(wrongs.length<3)wrongs.push(wrongs[0]||'---');
+  const opts=[correct,...wrongs.slice(0,3)];
+  for(let i=opts.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[opts[i],opts[j]]=[opts[j],opts[i]];}
+  return{q:question,opts,correct:opts.indexOf(correct),audio};
+};
+const makeQuiz=c=>{
+  if(!c?.chinese)return[{q:'Ready to continue?',opts:['Yes','Review','Next','Skip'],correct:0}];
+  const qs=[
+    makeQ(`What does "${c.chinese[0]}" mean?`,c.english[0],c.english.slice(1),c.chinese[0]),
+    makeQ(`How do you write "${c.english[0]}" in Chinese?`,c.chinese[0],c.chinese.slice(1),c.chinese[0])
+  ];
+  if(c.chinese.length>1)qs.push(makeQ(`What does "${c.chinese[1]}" mean?`,c.english[1],c.english.filter((_,i)=>i!==1),c.chinese[1]));
+  return qs;
+};
+
+// ── ACTIONS ──
+const completeLesson=()=>{
+  const id=lId(),was=S.done.has(id);
+  S.done.add(id);
+  if(!was)S.todayDone++; // Only count if not already done
+  S.inQuiz=false;S.showCompletion=true;render();
+};
+const nextLesson=()=>{
+  S.showCompletion=false;
+  const wd=wData(),wkeys=Object.keys(PLAN[S.month].weeks).map(Number);
+  if(S.lesson<wd.lessons.length-1)S.lesson++;
+  else{const nw=wkeys.find(w=>w>S.week);if(nw){S.week=nw;S.lesson=0;}}
+  render();
+};
+const startQuiz=()=>{
+  Q.exercises=makeQuiz(lContent());Q.index=0;Q.score=0;Q.answered=null;Q.failed=false;
+  S.inQuiz=true;S.showCompletion=false;render();
+};
+// Module-level Q means no stale closure — Q.index is always current value
+const answerQ=idx=>{
+  if(Q.answered!==null)return;
+  Q.answered=idx;
+  if(idx===Q.exercises[Q.index].correct)Q.score++;
+  render();
+  setTimeout(()=>{
+    if(Q.index<Q.exercises.length-1){Q.index++;Q.answered=null;render();}
+    else{
+      if(Q.score>=Math.ceil(Q.exercises.length/2))completeLesson(); // Pass threshold: 50%
+      else{Q.failed=true;render();}
+    }
+  },1700);
+};
+const goTo=(mn,wn,li)=>{stopAudio();S.month=+mn;S.week=+wn;S.lesson=+li;S.tab='today';S.inQuiz=false;S.showCompletion=false;Q.answered=null;Q.failed=false;render();};
+
+// ── RENDER ── (single event listener bound once — no listener accumulation)
+let bound=false;
+const render=()=>{
+  validate();
+  document.getElementById('root').innerHTML=buildApp();
+  if(!bound){
+    bound=true;
+    document.getElementById('root').addEventListener('click',handleClick);
+  }
+};
+
+const buildApp=()=>`
+<div class="hdr"><div><h1>中文 Mandarin</h1><p>10 minutes daily to fluency</p></div>
+<div class="stats">
+  <div class="stat"><div class="val s-red">🔥 ${S.streak}</div><div class="lbl">streak</div></div>
+  <div class="stat"><div class="val s-blue">${progPct()}%</div><div class="lbl">complete</div></div>
+</div></div>
+<div class="tabs">
+  <button class="tab ${S.tab==='today'?'on':''}" data-a="tab" data-v="today">★ Today</button>
+  <button class="tab ${S.tab==='progress'?'on':''}" data-a="tab" data-v="progress">▦ Progress</button>
+  <button class="tab ${S.tab==='all'?'on':''}" data-a="tab" data-v="all">☰ All Lessons</button>
+</div>
+<div class="main">${S.tab==='today'?buildToday():S.tab==='progress'?buildProgress():buildAll()}</div>`;
+
+const buildToday=()=>{
+  if(S.inQuiz)return buildQuiz();
+  const mn=PLAN[S.month]||{},wd=wData(),ld=lData(),c=lContent(),id=lId(),done=S.done.has(id);
+  const rem=Math.max(0,3-S.todayDone);
+  return`<div class="goal"><div><h3>Today's goal: 3 lessons</h3><p>${rem>0?rem+' more to go!':'✓ Goal achieved!'}</p></div><div class="num">${S.todayDone}/3<span>lessons</span></div></div>
+<div id="anote" class="anote">Audio not supported in this browser. Try Chrome or Safari for pronunciation.</div>
+<div class="card">
+  <div class="card-hd"><div><h2>${ld.title}</h2><p>Month ${S.month} · Week ${S.week} · ${ld.type}</p></div><span class="dur">${ld.duration}</span></div>
+  <div class="subnav">${Object.keys(mn.weeks||{}).map(wn=>`<button class="pill ${S.week==wn?'on':''}" data-a="week" data-v="${wn}">Week ${wn}</button>`).join('')}</div>
+  <div class="subnav">${(wd.lessons||[]).map((l,i)=>{const lid=`${S.month}-${S.week}-${i}`,dc=S.done.has(lid);return`<button class="pill ${S.lesson===i?'on':dc?'dn':''}" data-a="lesson" data-v="${i}">${dc?'✓ ':''}${l.title}</button>`;}).join('')}</div>
+  <div class="body">${c?buildVocab(c,done):buildNoContent(done)}${S.showCompletion?buildCompletionBanner():''}</div>
+</div>`;
+};
+
+const buildVocab=(c,done)=>`
+<div class="sh"><span>Learn these</span><button class="pall" data-a="playall">▶ Play all</button></div>
+${c.chinese.map((ch,i)=>`<div class="vrow ${S.playingId===i?'pl':''}">
+  <div class="vl"><span class="vc">${ch}</span><div><div class="vp">${c.pinyin[i]}</div><div class="ve">${c.english[i]}</div></div></div>
+  <button class="spk ${S.playingId===i?'pl':''}" data-a="speak" data-i="${i}">${S.playingId===i?'⏸':'🔊'}</button>
+</div>`).join('')}
+<div class="tip"><strong>💡 Pro tip</strong>${c.tip}</div>
+${!S.showCompletion?`<div class="acts"><button class="bq" data-a="quiz">🎯 Start quiz</button>${done?'<div class="bdone">✓ Completed</div>':'<button class="bc" data-a="complete">✓ Mark done</button>'}</div>`:''}`;
+
+const buildNoContent=done=>`<div class="nocont"><p>Lesson content coming soon. Mark as reviewed to continue.</p>${done?'<div class="bdone">✓ Completed</div>':'<button class="bc" data-a="complete">✓ Mark done</button>'}</div>`;
+const buildCompletionBanner=()=>`<div class="cbanner"><h3>🎉 Lesson complete!</h3><p>Consistency is the key to fluency. Keep going!</p><button class="bnext" data-a="next">Next lesson →</button></div>`;
+
+const buildQuiz=()=>{
+  const ex=Q.exercises[Q.index];
+  if(Q.failed)return`<div class="qwrap"><div class="qhd"><h3>Quiz result</h3><span class="qpill">${Q.score}/${Q.exercises.length}</span></div>
+<div class="qfail"><p>You scored ${Q.score}/${Q.exercises.length}. You need at least ${Math.ceil(Q.exercises.length/2)} correct to pass. Review the lesson and try again.</p>
+<button class="bretry" data-a="retry">Try again</button></div>
+<button class="bq" style="margin-top:10px;width:100%" data-a="back">← Back to lesson</button></div>`;
+
+  return`<div class="qwrap"><div class="qhd"><h3>Quick quiz</h3><span class="qpill">Q${Q.index+1}/${Q.exercises.length}</span></div>
+<div class="qq"><p>${ex.q}</p>${ex.audio?`<button class="qlisten" data-a="qaudio" data-t="${ex.audio}">🔊 Listen</button>`:''}</div>
+<div class="qopts">${ex.opts.map((o,i)=>{let cls='qopt';if(Q.answered!==null){if(i===ex.correct)cls+=' cor';else if(i===Q.answered)cls+=' wrg';}
+return`<button class="${cls}" data-a="ans" data-i="${i}"${Q.answered!==null?' disabled':''}><span class="oll">${'ABCD'[i]}</span>${o}${Q.answered!==null&&i===ex.correct?' ✓':''}</button>`;}).join('')}</div>
+<div class="qstat"><div class="scr">Score: ${Q.score}/${Q.exercises.length}</div>${Q.answered!==null?`<div class="ht">${Q.index<Q.exercises.length-1?'Next question...':Q.score>=Math.ceil(Q.exercises.length/2)?'Passed! ✓':'Calculating result...'}</div>`:''}</div></div>`;
+};
+
+const buildProgress=()=>`
+<div class="sgrid">
+  <div class="mc"><div class="lbl">🔥 Streak</div><div class="val c-o">${S.streak}</div></div>
+  <div class="mc"><div class="lbl">📊 Overall</div><div class="val c-b">${progPct()}%</div></div>
+  <div class="mc"><div class="lbl">✓ Lessons</div><div class="val c-g">${S.done.size}</div></div>
+  <div class="mc"><div class="lbl">⭐ Today</div><div class="val c-t">${S.todayDone}/3</div></div>
+</div>
+<div class="pblock"><h3>Progress by month</h3>
+${Object.entries(PLAN).map(([mn,md])=>{const{done,total}=monthProg(mn),pct=total?Math.round(done/total*100):0;
+return`<div class="prow"><div class="prow-hd"><span>Month ${mn}: ${md.title}</span><span>${done}/${total}</span></div><div class="pbg"><div class="pfill" style="width:${pct}%"></div></div></div>`;}).join('')}
+</div>`;
+
+const buildAll=()=>Object.entries(PLAN).map(([mn,md])=>`
+<div class="mcard"><div class="mhd"><h3>Month ${mn}: ${md.title}</h3><p>${md.focus}</p></div>
+${Object.entries(md.weeks).map(([wn,wd])=>`<div class="wsec"><div class="wlbl">Week ${wn}: ${wd.title}</div>
+${wd.lessons.map((l,li)=>{const id=`${mn}-${wn}-${li}`,dc=S.done.has(id);
+return`<div class="li ${dc?'dn':''}" data-a="goto" data-m="${mn}" data-w="${wn}" data-l="${li}"><div class="li-l">${dc?'✓':' '} ${l.title}</div><span class="li-r">${l.duration}</span></div>`;}).join('')}
+</div>`).join('')}</div>`).join('');
+
+// ── SINGLE EVENT HANDLER (bound once, handles all interactions) ──
+const handleClick=e=>{
+  const t=e.target.closest('[data-a]');if(!t)return;
+  const a=t.dataset.a;
+  if(a==='tab'){stopAudio();S.tab=t.dataset.v;S.inQuiz=false;render();}
+  else if(a==='week'){stopAudio();S.week=+t.dataset.v;S.lesson=0;S.inQuiz=false;S.showCompletion=false;Q.answered=null;Q.failed=false;render();}
+  else if(a==='lesson'){stopAudio();S.lesson=+t.dataset.v;S.inQuiz=false;S.showCompletion=false;Q.answered=null;Q.failed=false;render();}
+  else if(a==='speak'){const i=+t.dataset.i,c=lContent();if(S.playingId===i){stopAudio();render();return;}if(c)speak(c.chinese[i],i);}
+  else if(a==='playall'){const c=lContent();if(!c)return;if(S.playingId==='all'){stopAudio();render();return;}speak(c.chinese.join(' '),'all');} // space not 、
+  else if(a==='quiz')startQuiz();
+  else if(a==='complete')completeLesson();
+  else if(a==='next')nextLesson();
+  else if(a==='ans')answerQ(+t.dataset.i);
+  else if(a==='retry')startQuiz();
+  else if(a==='back'){S.inQuiz=false;Q.failed=false;render();}
+  else if(a==='qaudio')speak(t.dataset.t,'quiz');
+  else if(a==='goto')goTo(t.dataset.m,t.dataset.w,t.dataset.l);
+};
+
+// ── INIT ──
+if('speechSynthesis'in window){window.speechSynthesis.onvoiceschanged=()=>window.speechSynthesis.getVoices();window.speechSynthesis.getVoices();}
+render();
+</script>
+</body>
+</html>
